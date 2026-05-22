@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPS Card — Location QR Code Generator for Google Maps Directions</title>
+  <meta name="description" content="Create a printable GPS location card with a QR code that opens Google Maps. Perfect for venues, hotels, restaurants, events, and shops — guests scan and navigate instantly.">
+  <meta name="keywords" content="GPS QR code, location QR generator, directions QR, maps QR code, venue QR card, printable location card, Google Maps QR, share location QR, event directions QR, hotel location card">
+  <meta name="robots" content="index, follow">
+  <meta name="google-adsense-account" content="ca-pub-9325652578538740">
+  <link rel="canonical" href="https://sampark-lodge.github.io/gps-card/">
+
+  <meta property="og:title" content="GPS Card — Location QR Code Generator">
+  <meta property="og:description" content="Create a printable GPS location card with a QR code that opens Google Maps.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sampark-lodge.github.io/gps-card/">
+  <meta property="og:image" content="https://sampark-lodge.github.io/gps-card/preview.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GPS Card — Location QR Code Generator">
+  <meta name="twitter:description" content="Create a printable GPS location card with a QR code that opens Google Maps.">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "GPS Card Generator",
+    "description": "Create printable GPS location cards with QR codes that open Google Maps directions. No signup, no backend.",
+    "url": "https://sampark-lodge.github.io/gps-card/",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Sampark Lodge"
+    },
+    "featureList": [
+      "Google Maps QR generation",
+      "Printable directions card",
+      "GPS coordinate input",
+      "Address-based QR",
+      "100% client-side"
+    ]
+  }
+  </script>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9325652578538740" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-hover: #27272a;
+      --border: #27272a;
+      --border-focus: #f59e0b;
+      --text: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.15);
+      --accent-subtle: rgba(245, 158, 11, 0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── Animated Background Orbs ── */
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-orbs .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.3;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .bg-orbs .orb:nth-child(1) {
+      width: 500px; height: 500px;
+      background: rgba(245, 158, 11, 0.10);
+      top: -10%; left: -10%;
+      animation-duration: 25s;
+    }
+
+    .bg-orbs .orb:nth-child(2) {
+      width: 400px; height: 400px;
+      background: rgba(239, 68, 68, 0.05);
+      bottom: -5%; right: -5%;
+      animation-delay: -7s;
+      animation-duration: 20s;
+    }
+
+    .bg-orbs .orb:nth-child(3) {
+      width: 300px; height: 300px;
+      background: rgba(245, 158, 11, 0.05);
+      top: 40%; left: 60%;
+      animation-delay: -14s;
+      animation-duration: 30s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(80px, -60px) scale(1.1); }
+      50% { transform: translate(-40px, 80px) scale(0.9); }
+      75% { transform: translate(60px, 40px) scale(1.05); }
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 500px;
+      padding: 32px 20px 48px;
+      animation: containerEnter 0.8s ease-out;
+    }
+
+    @keyframes containerEnter {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--accent-subtle);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 16px;
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      50% { box-shadow: 0 0 20px 0 rgba(245, 158, 11, 0.1); }
+    }
+
+    .header-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fafafa 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-top: 10px;
+      font-weight: 400;
+    }
+
+    .form-section {
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .field {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      transition: color 0.3s;
+    }
+
+    .field:focus-within label { color: var(--accent); }
+
+    .field input, .field textarea {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      background: rgba(39, 39, 42, 0.6);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .field input::placeholder, .field textarea::placeholder {
+      color: #3f3f46;
+      transition: color 0.3s;
+    }
+
+    .field input:focus::placeholder, .field textarea:focus::placeholder {
+      color: transparent;
+    }
+
+    .field input:hover, .field textarea:hover {
+      border-color: #3f3f46;
+      background: rgba(39, 39, 42, 0.8);
+    }
+
+    .field input:focus, .field textarea:focus {
+      border-color: var(--accent);
+      background: rgba(39, 39, 42, 0.9);
+      box-shadow: 0 0 0 4px var(--accent-glow), 0 0 30px rgba(245, 158, 11, 0.05);
+      transform: translateY(-1px);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 60px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .field .input-highlight {
+      position: absolute;
+      bottom: 0; left: 50%;
+      width: 0; height: 1.5px;
+      background: var(--accent);
+      border-radius: 1px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(-50%);
+    }
+
+    .field input:focus ~ .input-highlight,
+    .field textarea:focus ~ .input-highlight {
+      width: 100%;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .field-row .field { flex: 1; }
+
+    .qrcode-section {
+      text-align: center;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+
+    .qrcode-wrapper {
+      display: inline-block;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 20px 60px rgba(0,0,0,0.5);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
+    }
+
+    .qrcode-wrapper:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 24px 80px rgba(0,0,0,0.6);
+    }
+
+    #qrcode {
+      width: 260px; height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.5s;
+    }
+
+    #qrcode img {
+      display: block;
+      animation: qrAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes qrAppear {
+      from { opacity: 0; transform: scale(0.8) rotate(-3deg); }
+      to   { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
+    .placeholder-text {
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 60px 20px;
+      line-height: 1.6;
+    }
+
+    .card-section {
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease-out 0.35s both;
+      transition: transform 0.4s, box-shadow 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent);
+    }
+
+    .card-section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .card-section h2 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .location-icon {
+      width: 56px; height: 56px;
+      margin: 0 auto 16px;
+      background: var(--accent-subtle);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: iconPulse 4s ease-in-out infinite;
+      transition: transform 0.3s;
+    }
+
+    .location-icon:hover { transform: scale(1.1); }
+
+    .location-icon svg {
+      width: 26px; height: 26px;
+      color: var(--accent);
+    }
+
+    @keyframes iconPulse {
+      0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+      50% { box-shadow: 0 0 40px var(--accent-glow), 0 0 60px rgba(245, 158, 11, 0.05); }
+    }
+
+    .card-place-name {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+      animation: fadeInUp 0.5s ease-out 0.1s both;
+    }
+
+    .card-address {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      word-break: break-word;
+      animation: fadeInUp 0.5s ease-out 0.15s both;
+    }
+
+    .card-divider {
+      width: 32px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      margin: 0 auto 16px;
+      border-radius: 1px;
+    }
+
+    .card-coords {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.5s ease-out 0.2s both;
+    }
+
+    .card-coord-item {
+      text-align: center;
+    }
+
+    .card-coord-item .coord-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .card-coord-item .coord-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .open-maps-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px var(--accent-glow);
+      animation: fadeInUp 0.5s ease-out 0.25s both;
+    }
+
+    .open-maps-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow), 0 0 60px rgba(245, 158, 11, 0.1);
+    }
+
+    .open-maps-btn:active { transform: translateY(0) scale(0.97); }
+
+    .open-maps-btn svg {
+      width: 16px; height: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn:hover::after { opacity: 1; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: scale(0);
+      animation: rippleAnim 0.6s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow), 0 0 60px rgba(245, 158, 11, 0.1);
+    }
+
+    .btn-primary:active { transform: translateY(0) scale(0.97); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1.5px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn-secondary:active { transform: translateY(0) scale(0.97); }
+
+    .adsense-container {
+      min-height: 100px;
+      margin-bottom: 24px;
+      background: rgba(24, 24, 27, 0.4);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInUp 0.6s ease-out 0.45s both;
+    }
+
+    .adsense-container .ad-placeholder {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 16px 0 8px;
+      animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .footer svg {
+      width: 14px; height: 14px;
+      vertical-align: middle;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer a:hover {
+      color: #fbbf24;
+      text-decoration: underline;
+    }
+
+    @media print {
+      body { background: #fff !important; padding: 0; margin: 0; }
+      .bg-orbs, .grid-overlay, .header, .form-section, .qrcode-section,
+      .actions, .footer, .adsense-container { display: none !important; }
+      .card-section {
+        background: #fff !important;
+        border: 2px solid #000 !important;
+        border-radius: var(--radius) !important;
+        padding: 24px !important;
+        margin: 20mm auto !important;
+        max-width: 320px !important;
+        page-break-inside: avoid !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+      }
+      .card-section::before { display: none; }
+      .card-place-name { color: #000 !important; }
+      .card-address { color: #555 !important; }
+      .card-coord-item .coord-value { color: #b45309 !important; }
+      .location-icon { background: rgba(245, 158, 11, 0.1) !important; }
+      .location-icon svg { color: #b45309 !important; }
+      .open-maps-btn { background: #f59e0b !important; color: #000 !important; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 20px 16px 32px; }
+      .header h1 { font-size: 28px; }
+      .form-section { padding: 20px; border-radius: 16px; }
+      .card-section { padding: 24px 20px; }
+      .actions { flex-direction: column; }
+      .field-row { flex-direction: column; gap: 0; }
+      .card-coords { gap: 16px; }
+      .qrcode-wrapper:hover { transform: none; }
+      .card-section:hover { transform: none; }
+      .bg-orbs .orb { filter: blur(80px); }
+      .bg-orbs .orb:nth-child(1) { width: 300px; height: 300px; }
+      .bg-orbs .orb:nth-child(2) { width: 250px; height: 250px; }
+      .bg-orbs .orb:nth-child(3) { width: 200px; height: 200px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="header-badge">
+        <span class="dot"></span>
+        Directions · One Scan
+      </div>
+      <h1>GPS Card</h1>
+      <p>Turn any location into a scannable directions card.<br>Guests scan. Maps opens. They arrive.</p>
+    </div>
+
+    <div class="form-section">
+      <div class="field">
+        <label for="placeName">Place Name</label>
+        <input type="text" id="placeName" placeholder="e.g. Sampark Lodge" autocomplete="off" spellcheck="false">
+        <span class="input-highlight"></span>
+      </div>
+      <div class="field">
+        <label for="address">Address</label>
+        <textarea id="address" placeholder="e.g. 123 Main Street, City, State, ZIP" rows="2"></textarea>
+        <span class="input-highlight"></span>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="latitude">Latitude</label>
+          <input type="text" id="latitude" placeholder="e.g. 10.1012">
+          <span class="input-highlight"></span>
+        </div>
+        <div class="field">
+          <label for="longitude">Longitude</label>
+          <input type="text" id="longitude" placeholder="e.g. 77.0599">
+          <span class="input-highlight"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="qrcode-section">
+      <div class="qrcode-wrapper">
+        <div id="qrcode">
+          <div class="placeholder-text">Enter a location<br>to generate your GPS QR</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <h2>Directions Card</h2>
+      <div class="location-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+      <div class="card-place-name" id="cardPlaceName">—</div>
+      <div class="card-address" id="cardAddress">—</div>
+      <div class="card-divider"></div>
+      <div class="card-coords">
+        <div class="card-coord-item">
+          <div class="coord-label">Lat</div>
+          <div class="coord-value" id="cardLat">—</div>
+        </div>
+        <div class="card-coord-item">
+          <div class="coord-label">Lng</div>
+          <div class="coord-value" id="cardLng">—</div>
+        </div>
+      </div>
+      <a class="open-maps-btn" id="mapsLink" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Open in Google Maps
+      </a>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="printBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        Print Card
+      </button>
+      <button class="btn btn-secondary" id="downloadBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download QR
+      </button>
+    </div>
+
+    <div class="adsense-container">
+      <span class="ad-placeholder">— Advertisement —</span>
+    </div>
+
+    <div class="footer">
+      <p>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Your data stays on your device. Nothing is stored or transmitted.
+      </p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        Made with ❤️ for Sampark Lodge
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        this.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+      });
+    });
+
+    let qrCodeInstance = null;
+    const inputs = ['placeName', 'address', 'latitude', 'longitude'];
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateCard);
+    });
+
+    function buildMapsUrl() {
+      const address = document.getElementById('address').value.trim();
+      const lat = document.getElementById('latitude').value.trim();
+      const lng = document.getElementById('longitude').value.trim();
+
+      if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        return `https://maps.google.com/maps?q=${lat},${lng}`;
+      }
+      if (address) {
+        return `https://maps.google.com/maps?q=${encodeURIComponent(address)}`;
+      }
+      return '';
+    }
+
+    function hasAnyInput() {
+      return inputs.some(id => {
+        const el = document.getElementById(id);
+        return el && el.value.trim().length > 0;
+      });
+    }
+
+    function updateCard() {
+      const placeName = document.getElementById('placeName').value.trim() || '—';
+      const address = document.getElementById('address').value.trim() || '—';
+      const lat = document.getElementById('latitude').value.trim();
+      const lng = document.getElementById('longitude').value.trim();
+
+      document.getElementById('cardPlaceName').textContent = placeName;
+      document.getElementById('cardAddress').textContent = address;
+      document.getElementById('cardLat').textContent = lat && !isNaN(lat) ? lat : '—';
+      document.getElementById('cardLng').textContent = lng && !isNaN(lng) ? lng : '—';
+
+      const mapsUrl = buildMapsUrl();
+      const mapsLink = document.getElementById('mapsLink');
+      if (mapsUrl) {
+        mapsLink.href = mapsUrl;
+        mapsLink.style.opacity = '1';
+      } else {
+        mapsLink.href = '#';
+        mapsLink.style.opacity = '0.4';
+      }
+
+      regenerateQR();
+    }
+
+    function regenerateQR() {
+      const qrContainer = document.getElementById('qrcode');
+      const mapsUrl = buildMapsUrl();
+
+      if (!mapsUrl) {
+        qrContainer.innerHTML = '<div class="placeholder-text">Enter a location<br>to generate your GPS QR</div>';
+        return;
+      }
+
+      qrContainer.innerHTML = '';
+      const qrSize = Math.min(260, Math.min(window.innerWidth - 100, 260));
+
+      try {
+        qrCodeInstance = new QRCode(qrContainer, {
+          text: mapsUrl,
+          width: qrSize,
+          height: qrSize,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (e) {
+        qrContainer.innerHTML = '<div class="placeholder-text">Error generating QR</div>';
+      }
+    }
+
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const img = document.querySelector('#qrcode img');
+      if (img) {
+        const link = document.createElement('a');
+        link.download = 'gps-card-qr.png';
+        link.href = img.src;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        alert('Generate a QR code first by entering a location.');
+      }
+    });
+
+    updateCard();
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (buildMapsUrl()) regenerateQR();
+      }, 250);
+    });
+  </script>
+</body>
+</html>
