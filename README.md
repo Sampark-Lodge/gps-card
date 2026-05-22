@@ -35,7 +35,7 @@
 
 ## ✦ Overview
 
-**GPS Card** creates a printable location card with a QR code that opens **Google Maps** — no apps, no signups, no backend. Anyone with a phone camera can scan and navigate to your location instantly.
+**GPS Card** lets you **drop a pin on an interactive map** and generates a printable location card with a Google Maps directions QR code. Click anywhere, drag to fine-tune — no apps, no signups, no backend. Anyone with a phone camera scans and navigates instantly.
 
 Perfect for hotels, restaurants, event venues, shops, offices, wedding halls — anywhere guests need to find you.
 
@@ -45,8 +45,9 @@ Perfect for hotels, restaurants, event venues, shops, offices, wedding halls —
 
 | | |
 |---|---|
+| ✦ **🗺️ Interactive Map** | Click anywhere to drop a pin. Drag to fine-tune. Instant visual feedback |
 | ✦ **📍 Google Maps QR** | QR encodes a direct Maps deep link — tap and navigate |
-| ✦ **🌐 Address or Coordinates** | Enter by address, or precise lat/lng for accuracy |
+| ✦ **🌐 Address or Coordinates** | Enter by address or precise lat/lng — map auto-syncs |
 | ✦ **🖨️ Print ready** | One-tap print with clean card layout for tents, signage |
 | ✦ **⬇️ Download PNG** | Export QR for digital use — flyers, emails, social media |
 | ✦ **🔒 100% private** | Everything runs in your browser. Zero server calls |
@@ -59,20 +60,25 @@ Perfect for hotels, restaurants, event venues, shops, offices, wedding halls —
 ## ✦ How It Works
 
 ```
-      Enter Place Name  →  Add Address  →  Set Coordinates (optional)
-              │                │                      │
-              └────────────────┴──────────────────────┘
-                               │
-                    Google Maps QR generated instantly
-                               │
-                    ┌──────────┴──────────┐
-                    ▼                     ▼
-              Print Card           Download QR
+         Click Map → Pin drops → Coordinates auto-fill
+              │                      │
+              └──────────────────────┘
+                      │
+        Or type address / lat-lng → Map syncs
+                      │
+        ┌─────────────┴─────────────┐
+        ▼                           ▼
+  Google Maps QR generated    Draggable pin updates
+        │                     coordinates in real-time
+        │
+   ┌────┴────┐
+   ▼         ▼
+Print Card  Download QR
 
 ```
 
 <p align="center">
-  <em>QR encodes <code>https://maps.google.com/maps?q=...</code> — opens natively in Google Maps on iOS & Android.</em>
+  <em>QR encodes <code>https://maps.google.com/maps?q=lat,lng</code> — opens natively in Google Maps on iOS & Android.</em>
 </p>
 
 <br>
@@ -82,12 +88,20 @@ Perfect for hotels, restaurants, event venues, shops, offices, wedding halls —
 ```
 ┌──────────────────────────────────────────────────┐
 │                    GPS Card                       │
-│          Directions · One Scan                    │
+│             Interactive Map                       │
 │  ┌──────────────────────────────────────────────┐│
+│  │          ┌──────────────────────┐            ││
+│  │          │    🗺️  Map View      │            ││
+│  │          │      📍 Pin           │            ││
+│  │          │                      │            ││
+│  │          └──────────────────────┘            ││
+│  │  Lat: 10.1012              Lng: 77.0599      ││
+│  ├──────────────────────────────────────────────┤│
 │  │  Place Name       ┌──────────────────┐      ││
 │  │  Address          │  Sampark Lodge   │      ││
-│  │  Latitude     Lng │  Munnar, Kerala… │      ││
-│  │                   │  10.1012  77.0599│      ││
+│  │  Latitude         │  Munnar, Kerala… │      ││
+│  │  Longitude        │  10.1012         │      ││
+│  │                   │  77.0599         │      ││
 │  │                   └──────────────────┘      ││
 │  │         ┌──────────────┐                    ││
 │  │         │   [QR]       │                    ││
@@ -133,7 +147,8 @@ Perfect for hotels, restaurants, event venues, shops, offices, wedding halls —
 │  │          │  │  ions    │  │                │ │
 │  └──────────┘  └──────────┘  └────────────────┘ │
 │                                                   │
-│  External: qrcodejs (CDN)  •  Google Fonts (Inter)│
+│  External: Leaflet.js + OSM  •  qrcodejs (CDN)   │
+│           Google Fonts (Inter) • AdSense          │
 │  Hosting: GitHub Pages     •  AdSense             │
 └───────────────────────────────────────────────────┘
 ```
@@ -149,8 +164,10 @@ Perfect for hotels, restaurants, event venues, shops, offices, wedding halls —
 
 | Input | Generated URL |
 |---|---|
-| Lat/Lng | `https://maps.google.com/maps?q=10.1012,77.0599` |
+| Map Click / Lat-Lng | `https://maps.google.com/maps?q=10.1012,77.0599` |
 | Address | `https://maps.google.com/maps?q=Munnar%2C+Kerala%2C+India` |
+
+> **Pro tip:** Click the map to drop a pin — coordinates auto-fill. Drag the pin to fine-tune. No manual typing needed.
 
 <br>
 
